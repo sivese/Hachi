@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chip-8 Emulator</title>
+  <script src="chip8.js"></script> <!-- Glue code -->
+  <style>
+    body { font-family: sans-serif; margin: 0; background: #111; color: #eee; }
+    canvas { display: block; margin: 1em auto; border: 2px solid #444; image-rendering: pixelated; }
+    .menubar { background: #222; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .menubar button { background: #333; color: white; border: none; padding: 6px 12px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="menubar">
+    <div>Chip-8 Emulator</div>
+    <div>
+      <button onclick="Module.ccall('reset')">Reset</button>
+      <button onclick="Module.ccall('pause')">Pause</button>
+      <button onclick="Module.ccall('load_rom')">Load ROM</button>
+    </div>
+  </div>
+
+  <canvas id="screen" width="640" height="320"></canvas>
+
+  <script>
+    // Wait until the WASM module is ready
+    var Module = {
+      onRuntimeInitialized: function () {
+        console.log("WASM Ready");
+        // You can call exported functions here, e.g.:
+        // Module.ccall('reset', 'void');
+      }
+    };
+  </script>
+
+</body>
+</html>
