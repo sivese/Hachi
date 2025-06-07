@@ -1,21 +1,152 @@
-#include <stdio.h>
+#include <iostream>
+
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#endif
 
-extern "C" {
-    EMSCRIPTEN_KEEPALIVE void reset() {
-        printf("Resetting...\n");
+#include <SDL.h>
+#if defined(IMGUI_IMPL_OPENGL_ES2)
+#include <SDL_opengles2.h>
+#else
+#include <SDL_opengl.h>
+#endif
+
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
+
+template <typename T>
+struct Result {
+    T value;
+    //Error err;
+}; // simple and rust like...
+
+class Application {
+public:
+    Application() {
+        initSDL();
+        createWindow();
+        createGLContext();
+        setupImGui();
+    }
+    
+    virtual ~Application() {
+
     }
 
-    EMSCRIPTEN_KEEPALIVE void pause() {
-        printf("Pausing...\n");
+    void run() { 
+        #ifdef __EMSCRIPTEN__
+        emscripten_set_main_loop(mainLoop, 0, 1);
+        #endif
+     }
+private:
+    SDL_Window* window;
+    SDL_GLContext glContext;
+
+    void initSDL() {
+        auto result = SDL_Init(SDL_INIT_VIDEO);
+
+        if(result != 0) {
+            std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+            exit(1);
+        }
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     }
 
-    EMSCRIPTEN_KEEPALIVE void load_rom() {
-        printf("Loading ROM...\n");
-    }
-}
+    void createWindow() {
+        window = SDL_CreateWindow(
+            "Hachi", 
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+            640, 480, 
+            SDL_WINDOW_OPENGL
+        );
 
-int main() {
-    printf("Hello World!\n");
+        if(window == nullptr) {
+            std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << std::endl;
+            exit(1);
+        }
+    }
+
+    void createGLContext() {
+        glContext = SDL_GL_CreateContext(this->window);
+
+        if(glContext == nullptr) {
+            std::cerr << "SDL_GL_CreateContext failed: " << SDL_GetError() << std::endl;
+            exit(1);
+        }
+
+        SDL_GL_MakeCurrent(this->window, this->glContext);
+        SDL_GL_SetSwapInterval(1);
+    }
+    
+    void setupImGui() {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void) io;
+        ImGui::StyleColorsDark(); // Optional: Dark theme
+
+        ImGui_ImplSDL2_InitForOpenGL(window, glContext);
+        ImGui_ImplOpenGL3_Init("#version 300 es"); // WebGL2
+    }
+
+    void mainLoop() {
+        SDL_Event event;
+        
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+
+            if (event.type == SDL_QUIT)
+                break;
+        }
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
+
+        if(ImGui::BeginMainMenuBar()) {
+            if(ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Open ROM")) {
+                    std::cout<<"Open ROM"<<std::endl;
+                }
+
+                if (ImGui::MenuItem("Exit")) {
+                    std::cout<<"Exit"<<std::endl;
+                }
+
+                ImGui::EndMenu();
+            }
+
+            if(ImGui::BeginMenu("Emulation")) {
+                ImGui::MenuItem("Start");
+                ImGui::MenuItem("Pause");
+                ImGui::EndMenu();
+            }
+
+            if(ImGui::BeginMenu("Debug")) {
+                ImGui::MenuItem("Step Instruction");
+                ImGui::MenuItem("Reset");
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMainMenuBar();
+        }
+
+        ImGui::Render();
+        glViewport(0, 0, 640, 480);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        SDL_GL_SwapWindow(window);
+    }
+};
+
+extern "C" int main(int argc, char** argv) {
+    auto app = Application();
+    app.run();
+
     return 0;
 }

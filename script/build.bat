@@ -19,7 +19,13 @@ call emcmake cmake -B build
 echo Building camke script...
 call cmake --build build
 
-echo Build complete. Starting local server...
+echo Build complete. 
+
+set /p run=Do you want to run the server? (y/n)
+
+if /i "%run%"=="n" goto :eof
+
+echo Starting local server...
 start http://localhost:8080
 
 cd build
