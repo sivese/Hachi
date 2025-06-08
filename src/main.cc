@@ -131,10 +131,7 @@ private:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
     }
-};
-
-//I hate this fuck
-Application app;
+} app;
 
 void main_loop() {
     app.runFrame();

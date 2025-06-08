@@ -27,7 +27,14 @@ include_directories(
     ${IMGUI_DIR}/backends
 )
 
-add_executable(hachi src/main.cc ${IMGUI_SOURCES})
+set(
+    CHIP8_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/chip8.cc
+)
+
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+add_executable(hachi src/main.cc ${CHIP8_SOURCES} ${IMGUI_SOURCES})
 
 # Only needed for Emscripten
 if(EMSCRIPTEN)
