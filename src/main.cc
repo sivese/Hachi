@@ -1,7 +1,7 @@
 #include <iostream>
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
+#include <emscripten/emscripten.h>
 #endif
 
 #include <SDL.h>
@@ -29,16 +29,12 @@ public:
         createGLContext();
         setupImGui();
     }
-    
-    virtual ~Application() {
 
+    virtual ~Application() {
+    
     }
 
-    void run() { 
-        #ifdef __EMSCRIPTEN__
-        emscripten_set_main_loop(mainLoop, 0, 1);
-        #endif
-     }
+    friend void main_loop();
 private:
     SDL_Window* window;
     SDL_GLContext glContext;
@@ -52,8 +48,8 @@ private:
         }
 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     }
 
     void createWindow() {
@@ -92,49 +88,42 @@ private:
         ImGui_ImplOpenGL3_Init("#version 300 es"); // WebGL2
     }
 
-    void mainLoop() {
+    void runFrame() {
         SDL_Event event;
-        
-        while (SDL_PollEvent(&event)) {
+
+        while(SDL_PollEvent(&event)) {
             ImGui_ImplSDL2_ProcessEvent(&event);
 
-            if (event.type == SDL_QUIT)
-                break;
+            if(event.type == SDL_QUIT) {
+                exit(0);
+            }
         }
 
-        // Start the Dear ImGui frame
+        // ImGui frame logic
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
         if(ImGui::BeginMainMenuBar()) {
-            if(ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Open ROM")) {
-                    std::cout<<"Open ROM"<<std::endl;
-                }
-
-                if (ImGui::MenuItem("Exit")) {
-                    std::cout<<"Exit"<<std::endl;
-                }
-
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Open ROM")) std::cout << "Open ROM\n";
+                if (ImGui::MenuItem("Exit")) std::cout << "Exit\n";
                 ImGui::EndMenu();
             }
-
-            if(ImGui::BeginMenu("Emulation")) {
+            if (ImGui::BeginMenu("Emulation")) {
                 ImGui::MenuItem("Start");
                 ImGui::MenuItem("Pause");
                 ImGui::EndMenu();
             }
-
-            if(ImGui::BeginMenu("Debug")) {
+            if (ImGui::BeginMenu("Debug")) {
                 ImGui::MenuItem("Step Instruction");
                 ImGui::MenuItem("Reset");
                 ImGui::EndMenu();
             }
-
             ImGui::EndMainMenuBar();
         }
 
+        // Render
         ImGui::Render();
         glViewport(0, 0, 640, 480);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -144,9 +133,20 @@ private:
     }
 };
 
-extern "C" int main(int argc, char** argv) {
-    auto app = Application();
-    app.run();
+//I hate this fuck
+Application app;
+
+void main_loop() {
+    app.runFrame();
+}
+
+
+int main(int argc, char** argv) {
+    #ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(main_loop, 0, 1);
+    #else
+    main_loop();
+    #endif
 
     return 0;
 }
