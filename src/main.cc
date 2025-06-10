@@ -11,6 +11,8 @@
 #include <SDL_opengl.h>
 #endif
 
+#include "chip8.hh"
+#include "file_browser.hh"
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl3.h"
@@ -20,6 +22,8 @@ struct Result {
     T value;
     //Error err;
 }; // simple and rust like...
+
+void readRomFile(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*);
 
 class Application {
 public:
@@ -35,7 +39,9 @@ public:
     }
 
     friend void main_loop();
+    friend void readRomFile(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*);
 private:
+    Chip8 machine;
     SDL_Window* window;
     SDL_GLContext glContext;
 
@@ -106,7 +112,10 @@ private:
 
         if(ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Open ROM")) std::cout << "Open ROM\n";
+                if (ImGui::MenuItem("Open ROM")) { 
+                    emscripten_browser_file::upload(".ch8,.chip8,.rom", readRomFile);
+                    std::cout << "Open ROM\n";
+                }
                 if (ImGui::MenuItem("Exit")) std::cout << "Exit\n";
                 ImGui::EndMenu();
             }
@@ -120,6 +129,7 @@ private:
                 ImGui::MenuItem("Reset");
                 ImGui::EndMenu();
             }
+
             ImGui::EndMainMenuBar();
         }
 
@@ -131,7 +141,12 @@ private:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
     }
+
 } app;
+
+void readRomFile(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*) {
+    std::cout<<"Read ROM file: " << filename << std::endl;
+}
 
 void main_loop() {
     app.runFrame();
