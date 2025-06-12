@@ -113,7 +113,7 @@ private:
         if(ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open ROM")) { 
-                    emscripten_browser_file::upload(".ch8,.chip8,.rom", readRomFile);
+                    emscripten_browser_file::upload(".ch8,.chip8,.rom,.pdf", readRomFile);
                     std::cout << "Open ROM\n";
                 }
                 if (ImGui::MenuItem("Exit")) std::cout << "Exit\n";
