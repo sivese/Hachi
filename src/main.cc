@@ -23,7 +23,7 @@ struct Result {
     //Error err;
 }; // simple and rust like...
 
-void readRomFile(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*);
+void read_rom_file(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*);
 
 class Application {
 public:
@@ -39,7 +39,7 @@ public:
     }
 
     friend void main_loop();
-    friend void readRomFile(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*);
+    friend void read_rom_file(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*);
 private:
     Chip8 machine;
     SDL_Window* window;
@@ -113,8 +113,7 @@ private:
         if(ImGui::BeginMainMenuBar()) {
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Open ROM")) { 
-                    emscripten_browser_file::upload(".ch8,.chip8,.rom,.pdf", readRomFile);
-                    std::cout << "Open ROM\n";
+                    emscripten_browser_file::upload(".ch8,.chip8,.rom,.pdf", read_rom_file);
                 }
                 if (ImGui::MenuItem("Exit")) std::cout << "Exit\n";
                 ImGui::EndMenu();
@@ -144,8 +143,13 @@ private:
 
 } app;
 
-void readRomFile(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*) {
+//what is string_view?
+void read_rom_file(std::string const &filename, std::string const &mime_type, std::string_view buffer, void*) {
     std::cout<<"Read ROM file: " << filename << std::endl;
+    std::cout<<"Mime type: " << mime_type << std::endl; //Media type or file format
+    std::cout<<"Size: " << buffer.size() << std::endl;
+
+    app.machine.loadROM(reinterpret_cast<const uint8_t*>(buffer.data()), buffer.size());
 }
 
 void main_loop() {

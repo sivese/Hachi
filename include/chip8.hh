@@ -1,4 +1,7 @@
 #pragma once
+
+#include <chrono>
+#include <random>
 #include <cstdint>
 #include <array>
 
@@ -17,11 +20,17 @@ public:
     //chip8 screen resolution is 64x32
     const std::array<uint8_t, 64 * 32>& getDisplay() const;
 private:
-    static const uint32_t START_ADDRESS = 0x200;
+    static const uint32_t START_ADDRESS;
+    static const uint32_t FONTSET_SIZE;
+    static const uint32_t FONTSET_START_ADDRESS;
+    static uint8_t fontset[];
 
     std::array<uint8_t, 4096> memory; // 4kb = 4096 bytes
     std::array<uint8_t, 16> V{ }; // 16 8-bit registers
     
+    std::default_random_engine              rand_generator;
+    std::uniform_int_distribution<uint8_t>  rand_byte;
+
     uint16_t I = 0;
     uint16_t pc = START_ADDRESS; // program counter starts at 0x200
     
@@ -31,5 +40,9 @@ private:
     uint8_t delay_timer = 0;
     uint8_t sound_timer = 0;
 
-    std::array<uint8_t, 64 * 32> display{ }; // 64x32 pixel display
+    std::array<uint8_t, 64 * 32> video{ }; // 64x32 pixel display
+    uint16_t opcode;
+
+    void OP_00E0();
+    void OP_00EE();
 };
