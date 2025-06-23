@@ -40,7 +40,7 @@ void Chip8::emulateCycle() {
 
 }
 
-void Chip8::00E0() {
+void Chip8::OP_00E0() {
 	this->video.fill(0); // CLS, Clear the display
 }
 
@@ -60,4 +60,22 @@ void Chip8::OP_2NNN() {
 	stack[sp] = pc;
 	++sp;
 	pc = address; // CALL addr, Call subroutine at nnn
+}
+
+void Chip8::OP_3XKK() {
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t byte = opcode & 0x00FFu;
+
+	if(registers[Vx] == byte) {
+		pc += 2;
+	}
+}
+
+void Chip8::OP_4XKK() {
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t byte = opcode & 0x00FFu;
+
+	if(registers[Vx] != byte) {
+		pc += 2; // SNE Vx, byte, Skip next instruction if Vx != byte
+	}
 }

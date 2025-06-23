@@ -26,7 +26,7 @@ private:
     static uint8_t fontset[];
 
     std::array<uint8_t, 4096> memory; // 4kb = 4096 bytes
-    std::array<uint8_t, 16> V{ }; // 16 8-bit registers
+    std::array<uint8_t, 16> registers{ }; // 16 8-bit registers
     
     std::default_random_engine              rand_generator;
     std::uniform_int_distribution<uint8_t>  rand_byte;
@@ -43,8 +43,42 @@ private:
     std::array<uint8_t, 64 * 32> video{ }; // 64x32 pixel display
     uint16_t opcode;
 
+    /* 
+        Set of opcodes
+    */
     void OP_00E0();
     void OP_00EE();
     void OP_1NNN();
     void OP_2NNN();
+
+    void OP_3XKK();
+    void OP_4XKK();
+    void OP_5XY0();
+    void OP_6XKK();
+    void OP_7XKK();
+    void OP_8XY0();
+    void OP_8XY1();
+    void OP_8XY2();
+    void OP_8XY3();
+    void OP_8XY4();
+    void OP_8XY5();
+    void OP_8XY6();
+    void OP_8XY7();
+    void OP_8XYE();
+    void OP_9XY0();
+    void OP_ANNN();
+    void OP_BNNN();
+    void OP_CXKK();
+    void OP_DXYN();
+    void OP_EX9E();
+    void OP_EXA1();
+    void OP_FX07();
+    void OP_FX0A();
+    void OP_FX15();
+    void OP_FX18();
+    void OP_FX1E();
+    void OP_FX29();
+    void OP_FX33();
+    void OP_FX55();
+    void OP_FX65();
 };
