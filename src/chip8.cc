@@ -39,3 +39,25 @@ void Chip8::loadROM(const uint8_t* data, size_t size) {
 void Chip8::emulateCycle() {
 
 }
+
+void Chip8::00E0() {
+	this->video.fill(0); // CLS, Clear the display
+}
+
+void Chip8::OP_00EE() {
+	--sp;
+	pc = stack[sp]; // RET, Return from subroutine
+}
+
+void Chip8::OP_1NNN() {
+	uint16_t address = opcode & 0x0FFFu;
+	pc = address; // JP addr, Jump to location nnn
+}
+
+void Chip8::OP_2NNN() {
+	uint16_t address = opcode & 0x0FFFu;
+	
+	stack[sp] = pc;
+	++sp;
+	pc = address; // CALL addr, Call subroutine at nnn
+}
