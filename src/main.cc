@@ -4,11 +4,11 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <SDL_opengles2.h>
+#include <SDL/SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL/SDL_opengl.h>
 #endif
 
 #include "chip8.hh"
@@ -55,7 +55,7 @@ private:
 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     }
 
     void createWindow() {

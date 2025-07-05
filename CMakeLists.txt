@@ -34,18 +34,9 @@ set(
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
-add_executable(hachi src/main.cc ${CHIP8_SOURCES} ${IMGUI_SOURCES})
+add_executable(hachi ${CMAKE_SOURCE_DIR}/src/main.cc ${CHIP8_SOURCES} ${IMGUI_SOURCES})
 
 # Only needed for Emscripten
 if(EMSCRIPTEN)
-  set_target_properties(hachi PROPERTIES
-    LINK_FLAGS "-s WASM=1 
-                -s EXPORTED_FUNCTIONS=['_main','_malloc','_free'] 
-                -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','HEAPU8'] 
-                -s USE_SDL=2 
-                -s FULL_ES3=1 
-                -s ALLOW_MEMORY_GROWTH=1 
-                -s EXIT_RUNTIME=1 
-                -s ASSERTIONS=1"
-  )
+  set_target_properties(hachi PROPERTIES LINK_FLAGS "-s WASM=1 -s EXPORTED_FUNCTIONS=['_main','_malloc','_free'] -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','HEAPU8'] -s USE_SDL=2 -s FULL_ES3=1 -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s ASSERTIONS=1")
 endif()

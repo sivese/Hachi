@@ -2,7 +2,7 @@
 
 #include <string>
 #include <string_view>
-#include <emscripten.h>
+#include <emscripten/emscripten.h>
 
 #define _EM_JS_INLINE(ret, c_name, js_name, params, code)                          \
   extern "C" {                                                                     \
