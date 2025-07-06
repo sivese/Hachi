@@ -79,3 +79,33 @@ void Chip8::OP_4XKK() {
 		pc += 2; // SNE Vx, byte, Skip next instruction if Vx != byte
 	}
 }
+
+void Chip8::OP_5XY0() {
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+	if(registers[Vx] == registers[Vy]) {
+		pc += 2;
+	} // SE Vx, Vy, Skip next instruction if Vx == Vy
+}
+
+void Chip8::OP_6XKK() {
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t byte = opcode & 0x00FFu;
+
+	registers[Vx] = byte; // LD Vx, byte, Set Vx = byte
+}
+
+void Chip8::OP_7XKK() {
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t byte = opcode & 0x00FFu;
+
+	registers[Vx] += byte; // ADD Vx, byte, Set Vx = Vx + byte
+}
+
+void Chip8::OP_8XY0() {
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+	registers[Vx] = registers[Vy]; // LD Vx, Vy, Set Vx = Vy
+}

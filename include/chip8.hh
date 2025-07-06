@@ -50,13 +50,13 @@ private:
     void OP_00EE();
     void OP_1NNN();
     void OP_2NNN();
-
     void OP_3XKK();
     void OP_4XKK();
     void OP_5XY0();
     void OP_6XKK();
     void OP_7XKK();
     void OP_8XY0();
+    
     void OP_8XY1();
     void OP_8XY2();
     void OP_8XY3();
