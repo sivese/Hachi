@@ -56,7 +56,6 @@ private:
     void OP_6XKK();
     void OP_7XKK();
     void OP_8XY0();
-    
     void OP_8XY1();
     void OP_8XY2();
     void OP_8XY3();
