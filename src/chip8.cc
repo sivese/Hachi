@@ -1,4 +1,5 @@
 #include "chip8.hh"
+#include <cstring>
 
 const uint32_t Chip8::START_ADDRESS = 0x200;
 const uint32_t Chip8::FONTSET_START_ADDRESS = 0x50;
@@ -188,9 +189,34 @@ void Chip8::OP_8XY7() {
 }
 
 void Chip8::OP_8XYE() {
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
 
+	registers[0xF] = (registers[Vx] & 0x80u) >> 7u;
+	registers[Vx] <<= 1;
 }
 
 void Chip8::OP_9XY0() {
-	
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+	if (registers[Vx] != registers[Vy]) {
+		pc += 2;
+	}
+}
+
+void Chip8::OP_ANNN() {
+	uint16_t address = opcode & 0x0FFFu;
+	I = address; // LD I, addr, Set I = addr
+}
+
+void Chip8::OP_BNNN() {
+	uint16_t address = opcode & 0x0FFFu;
+	pc = registers[0] + address; // JP V0, addr, Jump to location nnn + V0
+}
+
+void Chip8::OP_CXKK() {
+	uint8_t Vx 	 = (opcode & 0x0F00u) >> 8u;
+	uint8_t byte = opcode & 0x00FFu;
+
+	registers[Vx] = rand_byte(rand_generator) & byte; // RND Vx, byte, Set Vx = random byte AND byte
 }
